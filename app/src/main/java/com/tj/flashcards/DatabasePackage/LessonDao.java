@@ -1,5 +1,7 @@
 package com.tj.flashcards.DatabasePackage;
 
+import android.arch.persistence.room.Query;
+
 import java.util.List;
 
 /**

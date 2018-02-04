@@ -13,4 +13,5 @@ import android.arch.persistence.room.RoomDatabase;
 @Database(entities = {FlashCard.class, Lesson.class}, version = 1) // {FlashCard.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract FlashCardDao flashCardDao();
+    public abstract LessonDao lessonDao();
 }

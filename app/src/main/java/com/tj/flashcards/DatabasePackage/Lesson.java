@@ -1,5 +1,9 @@
 package com.tj.flashcards.DatabasePackage;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+
 import java.util.List;
 
 /**
@@ -11,7 +15,7 @@ public class Lesson {
     @PrimaryKey
     private int id;
 
-    @ColumnInfo(name = "title");
+    @ColumnInfo(name = "title")
     private String title;
 
     private List<FlashCard> flashCardList;
@@ -26,5 +30,9 @@ public class Lesson {
 
     public List<FlashCard> getFlashCardList() {
         return this.flashCardList;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 }
