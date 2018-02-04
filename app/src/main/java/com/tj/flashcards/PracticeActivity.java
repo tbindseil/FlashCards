@@ -11,27 +11,16 @@ import android.widget.EditText;
  */
 
 public class PracticeActivity extends AppCompatActivity {
+    private final static String TITLE = "Title";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_practice);
 
-        // load particular lesson
-        Intent i = getIntent();
-
-        String help = "help";
-
-        try {
-            Lesson l = i.getParcelableExtra("lesson");
-            help = l.getTitle();
-        } catch (Exception e) {
-            help = Lesson.getLessons().get(0).getTitle();
-        }
-
         // display title
         EditText title = (EditText)findViewById(R.id.lessonTitle);
 
-        title.setText(help);
+        title.setText(TITLE);
     }
 }
