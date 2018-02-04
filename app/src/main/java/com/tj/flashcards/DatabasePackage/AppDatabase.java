@@ -1,10 +1,16 @@
 package com.tj.flashcards.DatabasePackage;
 
+import android.arch.persistence.room.Database;
+import android.arch.persistence.room.Room;
+import android.arch.persistence.room.RoomDatabase;
+
+
 /**
  * Created by TJ on 2/3/2018.
  */
 
-@Database(entities = {User.class}, version = 1)
+// TODO magic numbers?
+@Database(entities = {FlashCard.class, Lesson.class}, version = 1) // {FlashCard.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract FlashCardDao flashCardDao();
 }

@@ -10,13 +10,30 @@ import android.view.View;
 import android.widget.Button;
 import android.content.Intent;
 
+import android.arch.persistence.room.Room;
+
+import com.tj.flashcards.DatabasePackage.AppDatabase;
+import com.tj.flashcards.DatabasePackage.Lesson;
+import com.tj.flashcards.DatabasePackage.LessonDao;
+
 import java.util.Iterator;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
+    public static final String DATABASE_NAME = "database-name";
 
     private void listLessons() {
-        Iterator<Lesson> itr = Lesson.getLessons().iterator();
+        // get LessonDAO
+        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, DATABASE_NAME).build();
+
+
+
+
+
+        List<Lesson> getAll();
+        Iterator<Lesson> db = Lesson.getLessons().iterator();
         Lesson curr = null;
         while (itr.hasNext()) {
             // create portal buton
@@ -37,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Lesson.makeDummyLesson("dummmmmmy");
+        DatabasePackage.Lesson.makeDummyLesson("dummmmmmy");
         listLessons();
     }
 
