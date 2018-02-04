@@ -23,7 +23,7 @@ public class FlashCard {
     @ColumnInfo(name = "lesson")
     private int associatedLessonID;
 
-    public int getID() {
+    public int getId() {
         return this.id;
     }
 
@@ -38,6 +38,8 @@ public class FlashCard {
     public int getAssociatedLessonID() {
         return this.associatedLessonID;
     }
+
+    public void setId(int id) { this.id = id; }
 
     public void setFront(String front) {
         this.front = front;
