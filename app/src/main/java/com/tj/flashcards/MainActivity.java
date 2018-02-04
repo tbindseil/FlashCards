@@ -22,19 +22,18 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     public static final String DATABASE_NAME = "database-name";
+    public static final String LESSON_ID_FROM_MAIN_ACTIVITY = "title_id";
 
     private void listLessons() {
         // get LessonDAO
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, DATABASE_NAME).build();
 
+        List<Lesson> lessonsToDisplay = db.lessonDao().getAll();
 
-
-
-
-        List<Lesson> getAll();
-        Iterator<Lesson> db = Lesson.getLessons().iterator();
+        Iterator<Lesson> itr = lessonsToDisplay.iterator();
         Lesson curr = null;
+
         while (itr.hasNext()) {
             // create portal buton
             curr = itr.next();
@@ -54,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DatabasePackage.Lesson.makeDummyLesson("dummmmmmy");
         listLessons();
     }
 
@@ -65,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         private Lesson lesson;
 
         public void onClick(View view) {
-            intent.putExtra("lesson", lesson);
+            intent.putExtra(LESSON_ID_FROM_MAIN_ACTIVITY, lesson.getId());
             startActivity(intent);
         }
 
