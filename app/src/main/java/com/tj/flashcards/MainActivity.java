@@ -12,6 +12,7 @@ import android.content.Intent;
 
 import android.arch.persistence.room.Room;
 import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.tj.flashcards.DatabasePackage.AppDatabase;
 import com.tj.flashcards.DatabasePackage.Lesson;
@@ -28,17 +29,20 @@ public class MainActivity extends AppCompatActivity {
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
+        Button b = (Button) findViewById(R.id.create_botton);
 
         // Check which radio button was clicked
         switch(view.getId()) {
             case R.id.radio_edit:
-                if (checked)
-                    // add new button to lesson list
+                if (checked) {
+                    b.setVisibility(View.VISIBLE);
                     break;
+                }
             case R.id.radio_practice:
-                if (checked)
-                    // remove new button from lesson list
+                if (checked) {
+                    b.setVisibility(View.INVISIBLE);
                     break;
+                }
         }
     }
 
@@ -77,12 +81,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (!listLessons()) {
-            Button b = new Button(this);
-            b.setText("no lessons found, would you like to create one?");
-
-
-        }
+        // hide create button
+        Button b = (Button) findViewById(R.id.create_botton);
+        b.setText("Create Lesson");
+        b.setOnClickListener(new MenuListener(null));
+        b.setVisibility(View.INVISIBLE);
     }
 
 
@@ -92,12 +95,26 @@ public class MainActivity extends AppCompatActivity {
         private Lesson lesson;
 
         public void onClick(View view) {
-            intent.putExtra(LESSON_ID_FROM_MAIN_ACTIVITY, lesson.getId());
+            // choose edit or practice activity based on radio button
+            RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radio_group);
+            switch (radioGroup.getCheckedRadioButtonId()) {
+                case R.id.radio_edit:
+                    intent = new Intent(MainActivity.this, EditActivity.class);
+                    break;
+                case R.id.radio_practice:
+                    intent = new Intent(MainActivity.this, PracticeActivity.class);
+                    break;
+            }
+
+            if (lesson == null) {
+                intent.putExtra(LESSON_ID_FROM_MAIN_ACTIVITY, -1);
+            } else {
+                intent.putExtra(LESSON_ID_FROM_MAIN_ACTIVITY, lesson.getId());
+            }
             startActivity(intent);
         }
 
         MenuListener(Lesson l) {
-            intent = new Intent(MainActivity.this, PracticeActivity.class);
             lesson = l;
         }
     }
