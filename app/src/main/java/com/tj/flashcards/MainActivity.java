@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.content.Intent;
 
 import android.arch.persistence.room.Room;
+import android.widget.RadioButton;
 
 import com.tj.flashcards.DatabasePackage.AppDatabase;
 import com.tj.flashcards.DatabasePackage.Lesson;
@@ -24,12 +25,33 @@ public class MainActivity extends AppCompatActivity {
     public static final String DATABASE_NAME = "database-name";
     public static final String LESSON_ID_FROM_MAIN_ACTIVITY = "title_id";
 
-    private void listLessons() {
+    public void onRadioButtonClicked(View view) {
+        // Is the button now checked?
+        boolean checked = ((RadioButton) view).isChecked();
+
+        // Check which radio button was clicked
+        switch(view.getId()) {
+            case R.id.radio_edit:
+                if (checked)
+                    // add new button to lesson list
+                    break;
+            case R.id.radio_practice:
+                if (checked)
+                    // remove new button from lesson list
+                    break;
+        }
+    }
+
+    private boolean listLessons() {
         // get LessonDAO
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, DATABASE_NAME).build();
 
         List<Lesson> lessonsToDisplay = db.lessonDao().getAll();
+
+        if (lessonsToDisplay == null) {
+            return false;
+        }
 
         Iterator<Lesson> itr = lessonsToDisplay.iterator();
         Lesson curr = null;
@@ -46,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
             LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
             ll.addView(b, lp);
         }
+
+        return true;
     }
 
     @Override
@@ -53,7 +77,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        listLessons();
+        if (!listLessons()) {
+            Button b = new Button(this);
+            b.setText("no lessons found, would you like to create one?");
+
+
+        }
     }
 
 
