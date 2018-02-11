@@ -9,6 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tj.flashcards.DatabasePackage.API.AddLesson;
+import com.tj.flashcards.DatabasePackage.Lesson;
+
 public class EditActivity extends AppCompatActivity {
     private String title = "s";
 
@@ -34,13 +37,16 @@ public class EditActivity extends AppCompatActivity {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     // TODO, ensure title doesn't already exist
-
+                    // I think this is handled in onConflict thing
 
                     // display title
                     TextView lessonTitle = (TextView) findViewById(R.id.editLessonTitle);
                     lessonTitle.setText(input.getText().toString());
 
                     // write title to database
+                    Lesson toInsert = new Lesson();
+                    toInsert.setTitle(input.getText().toString());
+                    new AddLesson().execute(toInsert);
                 }
             });
 

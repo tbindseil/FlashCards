@@ -1,20 +1,21 @@
 package com.tj.flashcards;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import android.widget.EditText;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.view.ViewGroup.LayoutParams;
 import android.view.View;
 import android.widget.Button;
 import android.content.Intent;
 
-import android.arch.persistence.room.Room;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
-import com.tj.flashcards.DatabasePackage.AppDatabase;
+import com.tj.flashcards.DatabasePackage.DatabaseSetup;
 import com.tj.flashcards.DatabasePackage.Lesson;
 import com.tj.flashcards.DatabasePackage.LessonDao;
 
@@ -25,6 +26,12 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE";
     public static final String DATABASE_NAME = "database-name";
     public static final String LESSON_ID_FROM_MAIN_ACTIVITY = "title_id";
+
+    private static Context applicationContext;
+
+    public static Context getAppContext() {
+        return applicationContext;
+    }
 
     public void onRadioButtonClicked(View view) {
         // Is the button now checked?
@@ -46,48 +53,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private boolean listLessons() {
-        // get LessonDAO
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, DATABASE_NAME).build();
-
-        List<Lesson> lessonsToDisplay = db.lessonDao().getAll();
-
-        if (lessonsToDisplay == null) {
-            return false;
-        }
-
-        Iterator<Lesson> itr = lessonsToDisplay.iterator();
-        Lesson curr = null;
-
-        while (itr.hasNext()) {
-            // create portal buton
-            curr = itr.next();
-            Button b = new Button(this);
-            b.setText(curr.getTitle());
-
-            b.setOnClickListener(new MenuListener(curr));
-
-            LinearLayout ll = (LinearLayout)findViewById(R.id.buttonLayout);
-            LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-            ll.addView(b, lp);
-        }
-
-        return true;
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // allow access to ApplicationContext for databasse
+        applicationContext = getApplicationContext();
 
         // hide create button
         Button b = (Button) findViewById(R.id.create_botton);
         b.setText("Create Lesson");
         b.setOnClickListener(new MenuListener(null));
         b.setVisibility(View.INVISIBLE);
-    }
 
+        new GetAllLessons().execute();
+    }
 
     class MenuListener implements View.OnClickListener {
 
@@ -118,4 +99,33 @@ public class MainActivity extends AppCompatActivity {
             lesson = l;
         }
     }
+
+    class GetAllLessons extends AsyncTask<Void, Void, List<Lesson>> {
+        final LessonDao lessonDao = DatabaseSetup.getDatabase().lessonDao();
+
+        @Override
+        protected List<Lesson> doInBackground(Void... voids) {
+            return lessonDao.getAll();
+        }
+
+        protected void onPostExecute(List<Lesson> lessons) {
+            Iterator<Lesson> itr = lessons.iterator();
+            Lesson curr = null;
+
+            while (itr.hasNext()) {
+                // create portal buton
+                curr = itr.next();
+                Button b = new Button(MainActivity.this);
+                b.setText(curr.getTitle());
+
+                b.setOnClickListener(new MenuListener(curr));
+
+                LinearLayout ll = (LinearLayout)findViewById(R.id.buttonLayout);
+                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                ll.addView(b, lp);
+            }
+
+        }
+    }
+
 }

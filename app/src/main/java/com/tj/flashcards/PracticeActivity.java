@@ -8,9 +8,9 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.tj.flashcards.DatabasePackage.AppDatabase;
-import com.tj.flashcards.DatabasePackage.Lesson;
+ import com.tj.flashcards.DatabasePackage.Lesson;
 
-/**
+ /**
  * Created by TJ on 1/28/2018.
  */
 
@@ -22,7 +22,7 @@ public class PracticeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_practice);
 
-        int lessonID = getIntent().getParcelableExtra(MainActivity.LESSON_ID_FROM_MAIN_ACTIVITY);
+        int lessonID = getIntent().getIntExtra(MainActivity.LESSON_ID_FROM_MAIN_ACTIVITY, -1);
 
         // get Lesson object from the database
         AppDatabase db = Room.databaseBuilder(getApplicationContext(),
