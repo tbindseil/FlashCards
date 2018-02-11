@@ -15,6 +15,10 @@ public class GetLessonFromID extends AsyncTask<Integer, Void, Lesson> {
 
     @Override
     protected Lesson doInBackground(Integer... lessonId) {
-        return lessonDao.getLesson(lessonId[0]);
+        if (lessonId[0] == -1) {
+            return null;
+        } else {
+            return lessonDao.getLesson(lessonId[0]);
+        }
     }
 }

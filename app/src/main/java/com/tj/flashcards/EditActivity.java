@@ -37,12 +37,16 @@ public class EditActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                currLesson.setTitle(input.getText().toString());
-                new UpdateLesson().execute(currLesson);
+                if (currLesson != null) {
+                    currLesson.setTitle(input.getText().toString());
+                }
+                try {
+                    new UpdateLesson().execute(currLesson).get();
+                } catch (Exception e) {
 
-                // update button
-                Button title = (Button) findViewById(R.id.editLessonTitle);
-                title.setText(input.getText().toString());
+                }
+
+                fillInUI();
             }
         });
 
@@ -69,24 +73,28 @@ public class EditActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    // called after any changes are made and by onCreate
+    private void fillInUI() {
+        Button title = (Button) findViewById(R.id.editLessonTitle);
+        if (currLesson == null) {
+            title.setText("Add Lesson Title");
+        } else {
+            title.setText(currLesson.getTitle());
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
         Integer lessonID = getIntent().getIntExtra(MainActivity.LESSON_ID_FROM_MAIN_ACTIVITY, -1);
-        // display title
-        Button title = (Button) findViewById(R.id.editLessonTitle);
-        if (lessonID == -1) {
-            title.setText("<Add Lesson Title>");
-            currLesson = new Lesson();
-        } else {
-            try {
-                currLesson = new GetLessonFromID().execute(lessonID).get();
-                title.setText(currLesson.getTitle());
-            } catch (Exception e) {
-                Toast.makeText(this, "I tried", Toast.LENGTH_LONG).show();
-            }
+        try {
+            currLesson = new GetLessonFromID().execute(lessonID).get();
+        } catch (Exception e) {
+            currLesson = null;
         }
+
+        fillInUI();
     }
 }
