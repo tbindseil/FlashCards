@@ -29,25 +29,31 @@ public class MainActivity extends AppCompatActivity {
 
     private static Context applicationContext;
 
+    private static Button createButton = null;
+
     public static Context getAppContext() {
         return applicationContext;
     }
 
     public void onRadioButtonClicked(View view) {
+        // ensure createButton initialized before editting it
+        if (createButton == null) {
+            return;
+        }
+
         // Is the button now checked?
         boolean checked = ((RadioButton) view).isChecked();
-        Button b = (Button) findViewById(R.id.create_botton);
 
         // Check which radio button was clicked
         switch(view.getId()) {
             case R.id.radio_edit:
                 if (checked) {
-                    b.setVisibility(View.VISIBLE);
+                    createButton.setVisibility(View.VISIBLE);
                     break;
                 }
             case R.id.radio_practice:
                 if (checked) {
-                    b.setVisibility(View.INVISIBLE);
+                    createButton.setVisibility(View.INVISIBLE);
                     break;
                 }
         }
@@ -61,13 +67,15 @@ public class MainActivity extends AppCompatActivity {
         // allow access to ApplicationContext for databasse
         applicationContext = getApplicationContext();
 
-        // hide create button
-        Button b = (Button) findViewById(R.id.create_botton);
-        b.setText("Create Lesson");
-        b.setOnClickListener(new MenuListener(null));
-        b.setVisibility(View.INVISIBLE);
-
         new GetAllLessons().execute();
+
+        // hide create button
+        createButton = new Button(this);
+        createButton.setText("Create Lesson");
+        createButton.setOnClickListener(new MenuListener(null));
+        createButton.setVisibility(View.INVISIBLE);
+        LinearLayout ll = (LinearLayout)findViewById(R.id.buttonLayout);
+        ll.addView(createButton);
     }
 
     class MenuListener implements View.OnClickListener {
@@ -116,13 +124,13 @@ public class MainActivity extends AppCompatActivity {
                 // create portal buton
                 curr = itr.next();
                 Button b = new Button(MainActivity.this);
-                b.setText(curr.getTitle());
+                String toPost = curr.getTitle() + curr.getId();
+                b.setText(toPost);
 
                 b.setOnClickListener(new MenuListener(curr));
 
                 LinearLayout ll = (LinearLayout)findViewById(R.id.buttonLayout);
-                ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                ll.addView(b, lp);
+                ll.addView(b);
             }
 
         }
