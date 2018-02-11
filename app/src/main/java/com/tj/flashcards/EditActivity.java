@@ -1,6 +1,7 @@
 package com.tj.flashcards;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.SystemClock;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +21,11 @@ public class EditActivity extends AppCompatActivity {
     private String title = "s";
     private Lesson currLesson = null;
 
+    public void onSaveLessonClicked(View view) {
+        Intent intent = new Intent(EditActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
     public void onDeleteLessonClicked(View view) {
         Integer lessonId = getIntent().getIntExtra(MainActivity.LESSON_ID_FROM_MAIN_ACTIVITY, -1);
         try {
@@ -27,6 +33,13 @@ public class EditActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "I tried to delete", Toast.LENGTH_LONG).show();
         }
+        Intent intent = new Intent(EditActivity.this, MainActivity.class);
+        startActivity(intent);
+    }
+
+    public void onAbandonButtonClicked(View view) {
+        Intent intent = new Intent(EditActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 
     @Override
@@ -49,53 +62,4 @@ public class EditActivity extends AppCompatActivity {
             }
         }
     }
-
-        // display cards
-
-
-/*
-        int lessonID = getIntent().getIntExtra(MainActivity.LESSON_ID_FROM_MAIN_ACTIVITY, -1);
-        if (lessonID == -1) {
-            // give lesson a title
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("Lesson Title:");
-
-            // Set up the input
-            final EditText input = new EditText(this);
-            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-            input.setInputType(InputType.TYPE_CLASS_TEXT);
-            builder.setView(input);
-
-            // Set up the buttons
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    Lesson toInsert = new Lesson();
-
-                    Boolean result = false;
-                    do {
-                        // write title to database
-                        toInsert.setTitle(input.getText().toString());
-                        try {
-                            result = new AddLesson().execute(toInsert).get();
-                        } catch (Exception e) {
-
-                        }
-                    } while (!result);
-
-                    // display title
-                    TextView lessonTitle = (TextView) findViewById(R.id.editLessonTitle);
-                    lessonTitle.setText(input.getText().toString());
-
-                }
-            });
-
-            builder.show();
-        } else {
-            // edit stuff
-        }
-
-
-    }
-*/
 }
