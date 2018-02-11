@@ -14,10 +14,10 @@ import android.content.Intent;
 
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
-import com.tj.flashcards.DatabasePackage.DatabaseSetup;
 import com.tj.flashcards.DatabasePackage.Lesson;
-import com.tj.flashcards.DatabasePackage.LessonDao;
+import com.tj.flashcards.DatabasePackage.API.GetAllLessons;
 
 import java.util.Iterator;
 import java.util.List;
@@ -59,6 +59,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    private boolean listLessons(List<Lesson> lessonsToDisplay) {
+
+        if (lessonsToDisplay == null) {
+            return false;
+        }
+
+        Iterator<Lesson> itr = lessonsToDisplay.iterator();
+        Lesson curr = null;
+
+        while (itr.hasNext()) {
+            // create portal buton
+            curr = itr.next();
+            Button b = new Button(this);
+            b.setText(curr.getTitle());
+
+            b.setOnClickListener(new MenuListener(curr));
+
+            LinearLayout ll = (LinearLayout) findViewById(R.id.buttonLayout);
+            LayoutParams lp = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+            ll.addView(b, lp);
+        }
+
+        return true;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,7 +93,12 @@ public class MainActivity extends AppCompatActivity {
         // allow access to ApplicationContext for databasse
         applicationContext = getApplicationContext();
 
-        new GetAllLessons().execute();
+        try {
+            List<Lesson> lessons = new GetAllLessons().execute().get();
+            listLessons(lessons);
+        } catch (Exception e) {
+            Toast.makeText(this, "I tried...", Toast.LENGTH_LONG);
+        }
 
         // hide create button
         createButton = new Button(this);
@@ -107,33 +138,4 @@ public class MainActivity extends AppCompatActivity {
             lesson = l;
         }
     }
-
-    class GetAllLessons extends AsyncTask<Void, Void, List<Lesson>> {
-        final LessonDao lessonDao = DatabaseSetup.getDatabase().lessonDao();
-
-        @Override
-        protected List<Lesson> doInBackground(Void... voids) {
-            return lessonDao.getAll();
-        }
-
-        protected void onPostExecute(List<Lesson> lessons) {
-            Iterator<Lesson> itr = lessons.iterator();
-            Lesson curr = null;
-
-            while (itr.hasNext()) {
-                // create portal buton
-                curr = itr.next();
-                Button b = new Button(MainActivity.this);
-                String toPost = curr.getTitle() + curr.getId();
-                b.setText(toPost);
-
-                b.setOnClickListener(new MenuListener(curr));
-
-                LinearLayout ll = (LinearLayout)findViewById(R.id.buttonLayout);
-                ll.addView(b);
-            }
-
-        }
-    }
-
 }
