@@ -1,6 +1,7 @@
 package com.tj.flashcards.DatabasePackage;
 
 import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
@@ -21,4 +22,7 @@ public interface LessonDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     void insertLesson(Lesson lesson);
+
+    @Delete
+    void deleteLessonByID(Lesson lesson);
 }

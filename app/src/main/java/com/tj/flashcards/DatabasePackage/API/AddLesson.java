@@ -12,16 +12,12 @@ import javax.xml.transform.Result;
  * Created by TJ on 2/11/2018.
  */
 
-public class AddLesson extends AsyncTask<Lesson, Void, Void> {
+public class AddLesson extends AsyncTask<Lesson, Void, Boolean> {
     final LessonDao lessonDao = DatabaseSetup.getDatabase().lessonDao();
 
     @Override
-    protected Void doInBackground(Lesson... lesson) {
+    protected Boolean doInBackground(Lesson... lesson) {
         lessonDao.insertLesson((com.tj.flashcards.DatabasePackage.Lesson) lesson[0]);
-        return null;
-    }
-
-    protected void onPostExecute(Boolean result) {
-
+        return Boolean.TRUE;
     }
 }

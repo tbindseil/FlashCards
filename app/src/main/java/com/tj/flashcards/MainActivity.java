@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
             List<Lesson> lessons = new GetAllLessons().execute().get();
             listLessons(lessons);
         } catch (Exception e) {
-            Toast.makeText(this, "I tried...", Toast.LENGTH_LONG);
+            Toast.makeText(this, "I tried...", Toast.LENGTH_LONG).show();
         }
 
         // hide create button
