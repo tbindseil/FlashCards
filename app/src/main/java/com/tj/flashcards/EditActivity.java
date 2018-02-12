@@ -10,13 +10,16 @@ import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.tj.flashcards.DatabasePackage.API.AddFlashCard;
 import com.tj.flashcards.DatabasePackage.API.AddLesson;
 import com.tj.flashcards.DatabasePackage.API.DeleteLessonByID;
 import com.tj.flashcards.DatabasePackage.API.GetLessonFromID;
 import com.tj.flashcards.DatabasePackage.API.UpdateLesson;
+import com.tj.flashcards.DatabasePackage.FlashCard;
 import com.tj.flashcards.DatabasePackage.Lesson;
 
 public class EditActivity extends AppCompatActivity {
@@ -73,6 +76,46 @@ public class EditActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    public class FlashCardListener implements View.OnClickListener {
+        @Override
+        public void onClick(View view) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
+            builder.setTitle("Enter New Card as <front>:<back>");
+
+            // Set up the input
+            final EditText input = new EditText(EditActivity.this);
+            // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+            // Set up the buttons
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // TODO check formatting
+                    String[] tokens = input.getText().toString().split(":");
+                    String front = tokens[0];
+                    String back = tokens[1];
+
+                    FlashCard toAdd = new FlashCard();
+                    toAdd.setFront(front);
+                    toAdd.setBack(back);
+                    toAdd.setAssociatedLessonID(currLesson.getId());
+
+                    try {
+                        new AddFlashCard().execute(toAdd).get();
+                    } catch (Exception e) {
+
+                    }
+
+                    fillInUI();
+                }
+            });
+
+            builder.show();
+        }
+    }
+
     // called after any changes are made and by onCreate
     private void fillInUI() {
         Button title = (Button) findViewById(R.id.editLessonTitle);
@@ -81,6 +124,14 @@ public class EditActivity extends AppCompatActivity {
         } else {
             title.setText(currLesson.getTitle());
         }
+
+        // TODO: clear list of flashcards
+
+        Button addFlashCard = new Button(this);
+        addFlashCard.setText("New Flash Card");
+        addFlashCard.setOnClickListener(new FlashCardListener());
+        LinearLayout ll = findViewById(R.id.buttonLayout);
+        ll.addView(addFlashCard);
     }
 
     @Override

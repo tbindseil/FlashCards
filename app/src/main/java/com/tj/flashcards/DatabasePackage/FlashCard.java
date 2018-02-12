@@ -2,15 +2,18 @@ package com.tj.flashcards.DatabasePackage;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.PrimaryKey;
 
 /**
  * Created by TJ on 2/3/2018.
  */
 
-@Entity
+@Entity(foreignKeys = @ForeignKey(entity = Lesson.class,
+                                  parentColumns = "id",
+                                  childColumns = "lessonID"))
 public class FlashCard {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     @ColumnInfo(name = "front")
@@ -20,7 +23,7 @@ public class FlashCard {
     private String back;
 
     // TODO account for one flashcard being a part of multiple lessons
-    @ColumnInfo(name = "lesson")
+    @ColumnInfo(name = "lessonID")
     private int associatedLessonID;
 
     public int getId() {
