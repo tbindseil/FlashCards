@@ -16,8 +16,10 @@ public class AddLesson extends AsyncTask<Lesson, Void, Boolean> {
     final LessonDao lessonDao = DatabaseSetup.getDatabase().lessonDao();
 
     @Override
-    protected Boolean doInBackground(Lesson... lesson) {
-        lessonDao.insertLesson((com.tj.flashcards.DatabasePackage.Lesson) lesson[0]);
+    protected Boolean doInBackground(Lesson... lessons) {
+        for (int i = 0; i < lessons.length; i++) {
+            lessonDao.insertLesson((com.tj.flashcards.DatabasePackage.Lesson) lessons[i]);
+        }
         return Boolean.TRUE;
     }
 }

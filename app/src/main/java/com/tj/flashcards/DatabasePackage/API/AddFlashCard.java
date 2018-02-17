@@ -16,7 +16,11 @@ public class AddFlashCard extends AsyncTask<FlashCard, Void, Boolean> {
 
     @Override
     protected Boolean doInBackground(FlashCard... flashCards) {
-        flashCardDao.insertFlashCard((com.tj.flashcards.DatabasePackage.FlashCard) flashCards[0]);
+        for (int i = 0; i < flashCards.length; i++) {
+            flashCardDao.insertFlashCard((com.tj.flashcards.DatabasePackage.FlashCard) flashCards[i]);
+        }
+
+        // why is this boolean?
         return Boolean.TRUE;
     }
 }

@@ -25,7 +25,7 @@ public interface LessonDao {
     void insertLesson(Lesson lesson);
 
     @Delete
-    void deleteLessonByID(Lesson lesson);
+    void deleteLesson(Lesson lesson);
 
     @Update
     void updateLesson(Lesson lesson);

@@ -15,7 +15,9 @@ public class UpdateLesson extends AsyncTask<Lesson, Void, Void> {
 
     @Override
     protected Void doInBackground(Lesson... lessons) {
-        lessonDao.updateLesson(lessons[0]);
+        for (int i = 0; i < lessons.length; i++) {
+            lessonDao.updateLesson(lessons[i]);
+        }
         return null;
     }
 }

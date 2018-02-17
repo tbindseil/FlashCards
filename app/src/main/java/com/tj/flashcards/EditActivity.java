@@ -17,7 +17,7 @@ import android.widget.Toast;
 import com.tj.flashcards.DatabasePackage.API.AddFlashCard;
 import com.tj.flashcards.DatabasePackage.API.AddLesson;
 import com.tj.flashcards.DatabasePackage.API.DeleteFlashCard;
-import com.tj.flashcards.DatabasePackage.API.DeleteLessonByID;
+import com.tj.flashcards.DatabasePackage.API.DeleteLesson;
 import com.tj.flashcards.DatabasePackage.API.GetCardsFromLessonID;
 import com.tj.flashcards.DatabasePackage.API.GetLessonFromID;
 import com.tj.flashcards.DatabasePackage.API.UpdateFlashCard;
@@ -65,31 +65,32 @@ public class EditActivity extends AppCompatActivity {
         builder.show();
     }
 
-    // todo pass array
     // todo background save
     // todo no duplicates in update list
     public void onSaveLessonClicked(View view) {
         if (currLesson != null) {
             if (newLesson) {
                 new AddLesson().execute(currLesson);
-            }
-            else {
+            } else {
                 new UpdateLesson().execute(currLesson);
             }
 
-            Iterator<FlashCard> itr = cardsToSave.iterator();
-            while (itr.hasNext()) {
-                new AddFlashCard().execute(itr.next());
+            FlashCard[] toSave = new FlashCard[cardsToSave.size()];
+            if (toSave.length > 0) {
+                toSave = cardsToSave.toArray(toSave);
+                new AddFlashCard().execute(toSave);
             }
 
-            itr = cardsToUpdate.iterator();
-            while (itr.hasNext()) {
-                new UpdateFlashCard().execute(itr.next());
+            FlashCard[] toUpdate = new FlashCard[cardsToUpdate.size()];
+            if (toUpdate.length > 0) {
+                toUpdate = cardsToUpdate.toArray(toUpdate);
+                new UpdateFlashCard().execute(toUpdate);
             }
 
-            itr = cardsToDelete.iterator();
-            while (itr.hasNext()) {
-                new DeleteFlashCard().execute(itr.next());
+            FlashCard[] toDelete = new FlashCard[cardsToDelete.size()];
+            if (toDelete.length > 0) {
+                toDelete = cardsToDelete.toArray(toDelete);
+                new DeleteFlashCard().execute(toDelete);
             }
         }
         Intent intent = new Intent(EditActivity.this, MainActivity.class);
@@ -97,16 +98,13 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public void onDeleteLessonClicked(View view) {
-        if (currLesson == null) {
-            Intent intent = new Intent(EditActivity.this, MainActivity.class);
-            startActivity(intent);
-            return;
-        }
-
-        try {
-            new DeleteLessonByID().execute(currLesson);
-        } catch (Exception e) {
-            Toast.makeText(this, "I tried to delete", Toast.LENGTH_LONG).show();
+        if (currLesson != null) {
+            try {
+                // deleting lesson will cascade and delete all of its cards
+                new DeleteLesson().execute(currLesson);
+            } catch (Exception e) {
+                Toast.makeText(this, "I tried to delete", Toast.LENGTH_LONG).show();
+            }
         }
         Intent intent = new Intent(EditActivity.this, MainActivity.class);
         startActivity(intent);

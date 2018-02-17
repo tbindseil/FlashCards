@@ -17,7 +17,9 @@ public class UpdateFlashCard extends AsyncTask<FlashCard, Void, Void> {
 
     @Override
     protected Void doInBackground(FlashCard... cards) {
-        flashCardDao.updateFlashCard(cards[0]);
+        for (int i = 0; i < cards.length; i++) {
+            flashCardDao.updateFlashCard(cards[i]);
+        }
         return null;
     }
 }

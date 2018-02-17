@@ -7,15 +7,17 @@ import com.tj.flashcards.DatabasePackage.Lesson;
 import com.tj.flashcards.DatabasePackage.LessonDao;
 
 /**
- * Created by TJ on 2/11/2018.
+ * Created by TJ on 2/17/2018.
  */
 
-public class DeleteLessonByID extends AsyncTask<Lesson, Void, Void> {
+public class DeleteLesson extends AsyncTask<Lesson, Void, Void> {
     final private LessonDao lessonDao = DatabaseSetup.getDatabase().lessonDao();
 
     @Override
     protected Void doInBackground(Lesson... lessons) {
-        lessonDao.deleteLessonByID(lessons[0]);
+        for (int i = 0; i < lessons.length; i++) {
+            lessonDao.deleteLesson(lessons[i]);
+        }
         return null;
     }
 }

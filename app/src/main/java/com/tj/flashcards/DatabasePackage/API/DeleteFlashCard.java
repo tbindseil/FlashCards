@@ -17,7 +17,9 @@ public class DeleteFlashCard extends AsyncTask<FlashCard, Void, Void> {
 
     @Override
     protected Void doInBackground(FlashCard... flashCards) {
-        flashCardDao.deleteFlashCard(flashCards[0]);
+        for (int i = 0; i < flashCards.length; i++) {
+            flashCardDao.deleteFlashCard(flashCards[i]);
+        }
         return null;
     }
 }
