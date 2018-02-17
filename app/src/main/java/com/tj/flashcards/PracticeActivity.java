@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
+import com.tj.flashcards.DatabasePackage.API.GetLessonFromID;
 import com.tj.flashcards.DatabasePackage.AppDatabase;
  import com.tj.flashcards.DatabasePackage.Lesson;
 
@@ -15,7 +16,7 @@ import com.tj.flashcards.DatabasePackage.AppDatabase;
  */
 
 public class PracticeActivity extends AppCompatActivity {
-    private final static String TITLE = "Title";
+    private Lesson currLesson;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,15 +25,19 @@ public class PracticeActivity extends AppCompatActivity {
 
         int lessonID = getIntent().getIntExtra(MainActivity.LESSON_ID_FROM_MAIN_ACTIVITY, -1);
 
-        // get Lesson object from the database
-        AppDatabase db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, MainActivity.DATABASE_NAME).build();
+        if (lessonID == -1) {
+            return;
+        }
 
-        Lesson currentLesson = db.lessonDao().getLesson(lessonID);
+        try {
+            currLesson = new GetLessonFromID().execute(lessonID).get();
+        } catch (Exception e) {
+            return;
+        }
 
         // display title
         EditText title = (EditText)findViewById(R.id.lessonTitle);
 
-        title.setText(currentLesson.getTitle());
+        title.setText(currLesson.getTitle());
     }
 }
