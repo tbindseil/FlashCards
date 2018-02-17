@@ -151,6 +151,13 @@ public class EditActivity extends AppCompatActivity {
         }
 
         // TODO: clear list of flashcards
+
+        // add new card button
+        Button addFlashCard = new Button(this);
+        addFlashCard.setText("New Flash Card");
+        addFlashCard.setOnClickListener(new FlashCardListener());
+        LinearLayout ll = findViewById(R.id.CardLayout);
+        ll.addView(addFlashCard);
     }
 
     @Override
@@ -170,13 +177,6 @@ public class EditActivity extends AppCompatActivity {
             newCard = true;
             currLesson = null;
         }
-
-        // add new card button
-        Button addFlashCard = new Button(this);
-        addFlashCard.setText("New Flash Card");
-        addFlashCard.setOnClickListener(new FlashCardListener());
-        LinearLayout ll = findViewById(R.id.CardLayout);
-        ll.addView(addFlashCard);
 
         fillInUI();
     }
