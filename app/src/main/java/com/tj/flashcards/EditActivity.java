@@ -23,7 +23,9 @@ import com.tj.flashcards.DatabasePackage.FlashCard;
 import com.tj.flashcards.DatabasePackage.Lesson;
 
 public class EditActivity extends AppCompatActivity {
-    private String title = "s";
+    //private String title = "s"
+    // used to save or update
+    private boolean newCard;
     private Lesson currLesson = null;
 
     public void onEditTitleButtonClicked(View view) {
@@ -45,12 +47,6 @@ public class EditActivity extends AppCompatActivity {
                 }
                 currLesson.setTitle(input.getText().toString());
 
-                try {
-                    new UpdateLesson().execute(currLesson).get();
-                } catch (Exception e) {
-
-                }
-
                 fillInUI();
             }
         });
@@ -59,11 +55,25 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public void onSaveLessonClicked(View view) {
+        if (currLesson != null) {
+            if (newCard) {
+                new AddLesson().execute(currLesson);
+            }
+            else {
+                new UpdateLesson().execute(currLesson);
+            }
+        }
         Intent intent = new Intent(EditActivity.this, MainActivity.class);
         startActivity(intent);
     }
 
     public void onDeleteLessonClicked(View view) {
+        if (currLesson == null) {
+            Intent intent = new Intent(EditActivity.this, MainActivity.class);
+            startActivity(intent);
+            return;
+        }
+
         try {
             new DeleteLessonByID().execute(currLesson);
         } catch (Exception e) {
@@ -82,6 +92,18 @@ public class EditActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
+            if (currLesson == null) {
+                builder.setTitle("enter lesson title and save first!");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+
+                builder.show();
+                return;
+            }
+
             builder.setTitle("Enter New Card as <front>:<back>");
 
             // Set up the input
@@ -109,12 +131,13 @@ public class EditActivity extends AppCompatActivity {
                     } catch (Exception e) {
 
                     }
-
-                    fillInUI();
                 }
             });
 
             builder.show();
+
+            // may need to be moved??
+            //fillInUI();
         }
     }
 
@@ -128,12 +151,6 @@ public class EditActivity extends AppCompatActivity {
         }
 
         // TODO: clear list of flashcards
-
-        Button addFlashCard = new Button(this);
-        addFlashCard.setText("New Flash Card");
-        addFlashCard.setOnClickListener(new FlashCardListener());
-        LinearLayout ll = findViewById(R.id.buttonLayout);
-        ll.addView(addFlashCard);
     }
 
     @Override
@@ -141,12 +158,25 @@ public class EditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
+        newCard = false;
+
         Integer lessonID = getIntent().getIntExtra(MainActivity.LESSON_ID_FROM_MAIN_ACTIVITY, -1);
         try {
             currLesson = new GetLessonFromID().execute(lessonID).get();
+            if (currLesson == null) {
+                newCard = true;
+            }
         } catch (Exception e) {
+            newCard = true;
             currLesson = null;
         }
+
+        // add new card button
+        Button addFlashCard = new Button(this);
+        addFlashCard.setText("New Flash Card");
+        addFlashCard.setOnClickListener(new FlashCardListener());
+        LinearLayout ll = findViewById(R.id.CardLayout);
+        ll.addView(addFlashCard);
 
         fillInUI();
     }
