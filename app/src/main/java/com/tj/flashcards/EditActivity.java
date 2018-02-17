@@ -19,17 +19,22 @@ import com.tj.flashcards.DatabasePackage.API.AddLesson;
 import com.tj.flashcards.DatabasePackage.API.DeleteLessonByID;
 import com.tj.flashcards.DatabasePackage.API.GetCardsFromLessonID;
 import com.tj.flashcards.DatabasePackage.API.GetLessonFromID;
+import com.tj.flashcards.DatabasePackage.API.UpdateFlashCard;
 import com.tj.flashcards.DatabasePackage.API.UpdateLesson;
 import com.tj.flashcards.DatabasePackage.FlashCard;
 import com.tj.flashcards.DatabasePackage.Lesson;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class EditActivity extends AppCompatActivity {
     //private String title = "s"
     // used to save or update
-    private boolean newCard;
+    private boolean newLesson;
+    // note probably should be queues
+    private List<FlashCard> cardsToSave = new ArrayList<FlashCard>();
+    private List<FlashCard> cardsToUpdate = new ArrayList<FlashCard>();
     private Lesson currLesson = null;
 
     public void onEditTitleButtonClicked(View view) {
@@ -60,11 +65,21 @@ public class EditActivity extends AppCompatActivity {
 
     public void onSaveLessonClicked(View view) {
         if (currLesson != null) {
-            if (newCard) {
+            if (newLesson) {
                 new AddLesson().execute(currLesson);
             }
             else {
                 new UpdateLesson().execute(currLesson);
+            }
+
+            Iterator<FlashCard> itr = cardsToSave.iterator();
+            while (itr.hasNext()) {
+                new AddFlashCard().execute(itr.next());
+            }
+
+            itr = cardsToUpdate.iterator();
+            while (itr.hasNext()) {
+                new UpdateFlashCard().execute(itr.next());
             }
         }
         Intent intent = new Intent(EditActivity.this, MainActivity.class);
@@ -134,6 +149,10 @@ public class EditActivity extends AppCompatActivity {
                     if (card == null) {
                         card = new FlashCard();
                         card.setAssociatedLessonID(currLesson.getId());
+                        cardsToSave.add(card);
+                    }
+                    else {
+                        cardsToUpdate.add(card);
                     }
 
                     card.setFront(front);
@@ -147,6 +166,7 @@ public class EditActivity extends AppCompatActivity {
                         } catch (Exception e) {
 
                         } */
+                    fillInUI();
                 }
             });
 
@@ -207,16 +227,16 @@ public class EditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
 
-        newCard = false;
+        newLesson = false;
 
         Integer lessonID = getIntent().getIntExtra(MainActivity.LESSON_ID_FROM_MAIN_ACTIVITY, -1);
         try {
             currLesson = new GetLessonFromID().execute(lessonID).get();
             if (currLesson == null) {
-                newCard = true;
+                newLesson = true;
             }
         } catch (Exception e) {
-            newCard = true;
+            newLesson = true;
             currLesson = null;
         }
 
