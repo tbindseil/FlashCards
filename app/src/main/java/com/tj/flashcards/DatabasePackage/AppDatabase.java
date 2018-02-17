@@ -10,7 +10,7 @@ import android.arch.persistence.room.RoomDatabase;
  */
 
 // TODO magic numbers?
-@Database(entities = {FlashCard.class, Lesson.class}, version = 2, exportSchema = false) // {FlashCard.class}, version = 1)
+@Database(entities = {FlashCard.class, Lesson.class}, version = 3, exportSchema = false) // {FlashCard.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
     public abstract FlashCardDao flashCardDao();
     public abstract LessonDao lessonDao();
