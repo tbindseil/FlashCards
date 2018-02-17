@@ -13,8 +13,8 @@ import java.util.List;
 
 @Dao
 public interface FlashCardDao {
-    @Query("SELECT * FROM flashcard")
-    List<FlashCard> getAll();
+    @Query("SELECT * FROM flashcard WHERE lessonID = (:lessonID)")
+    List<FlashCard> getCardsFromLessonID(int lessonID);
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     void insertFlashCard(FlashCard flashCard);

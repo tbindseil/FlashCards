@@ -17,10 +17,14 @@ import android.widget.Toast;
 import com.tj.flashcards.DatabasePackage.API.AddFlashCard;
 import com.tj.flashcards.DatabasePackage.API.AddLesson;
 import com.tj.flashcards.DatabasePackage.API.DeleteLessonByID;
+import com.tj.flashcards.DatabasePackage.API.GetCardsFromLessonID;
 import com.tj.flashcards.DatabasePackage.API.GetLessonFromID;
 import com.tj.flashcards.DatabasePackage.API.UpdateLesson;
 import com.tj.flashcards.DatabasePackage.FlashCard;
 import com.tj.flashcards.DatabasePackage.Lesson;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class EditActivity extends AppCompatActivity {
     //private String title = "s"
@@ -89,6 +93,12 @@ public class EditActivity extends AppCompatActivity {
     }
 
     public class FlashCardListener implements View.OnClickListener {
+        private FlashCard card;
+
+        public FlashCardListener(FlashCard card) {
+            this.card = card;
+        }
+
         @Override
         public void onClick(View view) {
             AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
@@ -121,16 +131,22 @@ public class EditActivity extends AppCompatActivity {
                     String front = tokens[0];
                     String back = tokens[1];
 
-                    FlashCard toAdd = new FlashCard();
-                    toAdd.setFront(front);
-                    toAdd.setBack(back);
-                    toAdd.setAssociatedLessonID(currLesson.getId());
-
-                    try {
-                        new AddFlashCard().execute(toAdd).get();
-                    } catch (Exception e) {
-
+                    if (card == null) {
+                        card = new FlashCard();
+                        card.setAssociatedLessonID(currLesson.getId());
                     }
+
+                    card.setFront(front);
+                    card.setBack(back);
+                    if (!currLesson.getFlashCardList().contains(card)) {
+                        currLesson.getFlashCardList().add(card);
+                    }
+                        /* TODO save in save button
+                        try {
+                            new AddFlashCard().execute(toAdd).get();
+                        } catch (Exception e) {
+
+                        } */
                 }
             });
 
@@ -150,14 +166,40 @@ public class EditActivity extends AppCompatActivity {
             title.setText(currLesson.getTitle());
         }
 
-        // TODO: clear list of flashcards
+        // clear all card buttons
+        LinearLayout ll = findViewById(R.id.CardLayout);
+        ll.removeAllViews();
 
         // add new card button
         Button addFlashCard = new Button(this);
         addFlashCard.setText("New Flash Card");
-        addFlashCard.setOnClickListener(new FlashCardListener());
-        LinearLayout ll = findViewById(R.id.CardLayout);
+        addFlashCard.setOnClickListener(new FlashCardListener(null));
         ll.addView(addFlashCard);
+
+        if (currLesson == null) {
+            return;
+        }
+
+        List<FlashCard> cardList = null;
+        // add button to edit all current cards
+        try {
+            cardList = new GetCardsFromLessonID().execute(currLesson.getId()).get();
+        } catch (Exception e) {
+
+        }
+
+        if (cardList == null) {
+            return;
+        }
+
+        Iterator<FlashCard> itr = cardList.iterator();
+        Button currCardButton = new Button(this);
+        while (itr.hasNext()) {
+            FlashCard currCard = itr.next();
+            currCardButton.setText(currCard.getFront() + ":" + currCard.getBack());
+            currCardButton.setOnClickListener(new FlashCardListener(currCard));
+            ll.addView(currCardButton);
+        }
     }
 
     @Override
