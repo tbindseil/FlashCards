@@ -6,6 +6,8 @@ import android.arch.persistence.room.ForeignKey;
 import android.arch.persistence.room.Index;
 import android.arch.persistence.room.PrimaryKey;
 
+import static android.arch.persistence.room.ForeignKey.CASCADE;
+
 /**
  * Created by TJ on 2/3/2018.
  */
@@ -13,7 +15,8 @@ import android.arch.persistence.room.PrimaryKey;
 @Entity(indices = {@Index("lessonID")},
         foreignKeys = @ForeignKey(entity = Lesson.class,
                                   parentColumns = "id",
-                                  childColumns = "lessonID"))
+                                  childColumns = "lessonID",
+                                  onDelete = CASCADE))
 public class FlashCard {
     @PrimaryKey(autoGenerate = true)
     private int id;
