@@ -5,6 +5,8 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
+import com.tj.flashcards.DatabasePackage.API.GetCardsFromLessonID;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,5 +46,13 @@ public class Lesson {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public void updateFlashCardList() {
+        try {
+            this.flashCardList = new GetCardsFromLessonID().execute(this.id).get();
+        } catch (Exception e) {
+
+        }
     }
 }

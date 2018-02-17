@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.tj.flashcards.DatabasePackage.API.AddFlashCard;
 import com.tj.flashcards.DatabasePackage.API.AddLesson;
+import com.tj.flashcards.DatabasePackage.API.DeleteFlashCard;
 import com.tj.flashcards.DatabasePackage.API.DeleteLessonByID;
 import com.tj.flashcards.DatabasePackage.API.GetCardsFromLessonID;
 import com.tj.flashcards.DatabasePackage.API.GetLessonFromID;
@@ -35,6 +36,7 @@ public class EditActivity extends AppCompatActivity {
     // note probably should be queues
     private List<FlashCard> cardsToSave = new ArrayList<FlashCard>();
     private List<FlashCard> cardsToUpdate = new ArrayList<FlashCard>();
+    private List<FlashCard> cardsToDelete = new ArrayList<FlashCard>();
     private Lesson currLesson = null;
 
     public void onEditTitleButtonClicked(View view) {
@@ -63,6 +65,9 @@ public class EditActivity extends AppCompatActivity {
         builder.show();
     }
 
+    // todo pass array
+    // todo background save
+    // todo no duplicates in update list
     public void onSaveLessonClicked(View view) {
         if (currLesson != null) {
             if (newLesson) {
@@ -80,6 +85,11 @@ public class EditActivity extends AppCompatActivity {
             itr = cardsToUpdate.iterator();
             while (itr.hasNext()) {
                 new UpdateFlashCard().execute(itr.next());
+            }
+
+            itr = cardsToDelete.iterator();
+            while (itr.hasNext()) {
+                new DeleteFlashCard().execute(itr.next());
             }
         }
         Intent intent = new Intent(EditActivity.this, MainActivity.class);
@@ -116,7 +126,7 @@ public class EditActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View view) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
+            final AlertDialog.Builder builder = new AlertDialog.Builder(EditActivity.this);
             if (currLesson == null) {
                 builder.setTitle("enter lesson title and save first!");
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -129,7 +139,12 @@ public class EditActivity extends AppCompatActivity {
                 return;
             }
 
-            builder.setTitle("Enter New Card as <front>:<back>");
+            if (card == null) {
+                builder.setTitle("Enter New Card as <front><colon><back>");
+            }
+            else {
+                builder.setTitle("Update Card as <front><colon><back>");
+            }
 
             // Set up the input
             final EditText input = new EditText(EditActivity.this);
@@ -138,42 +153,58 @@ public class EditActivity extends AppCompatActivity {
             builder.setView(input);
 
             // Set up the buttons
+
+            // allow for update/create
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // TODO check formatting
-                    String[] tokens = input.getText().toString().split(":");
-                    String front = tokens[0];
-                    String back = tokens[1];
+                    // input.getText is garuanteed to have a : thanks to the onclick below
+                    if (input.getText().toString().contains(":")) {
+                        String[] tokens = input.getText().toString().split(":");
+                        String front = tokens[0];
+                        String back = tokens[1];
 
-                    if (card == null) {
-                        card = new FlashCard();
-                        card.setAssociatedLessonID(currLesson.getId());
-                        cardsToSave.add(card);
+                        if (card == null) {
+                            card = new FlashCard();
+                            card.setAssociatedLessonID(currLesson.getId());
+                            cardsToSave.add(card);
+                            currLesson.getFlashCardList().add(card);
+                        } else {
+                            cardsToUpdate.add(card);
+                        }
+
+                        card.setFront(front);
+                        card.setBack(back);
+
+                        fillInUI();
                     }
-                    else {
-                        cardsToUpdate.add(card);
+                }
+            });
+
+            // allow for delete
+            builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    if (card != null) {
+                        // remove references to this card
+                        currLesson.getFlashCardList().remove(card);
+                        if (cardsToUpdate.contains(card)) {
+                            cardsToUpdate.remove(card);
+                        }
+                        if (cardsToSave.contains(card)) {
+                            cardsToSave.remove(card);
+                        }
+
+                        // ensure this card gets deleted
+                        cardsToDelete.add(card);
                     }
 
-                    card.setFront(front);
-                    card.setBack(back);
-                    if (!currLesson.getFlashCardList().contains(card)) {
-                        currLesson.getFlashCardList().add(card);
-                    }
-                        /* TODO save in save button
-                        try {
-                            new AddFlashCard().execute(toAdd).get();
-                        } catch (Exception e) {
-
-                        } */
                     fillInUI();
                 }
             });
 
             builder.show();
 
-            // may need to be moved??
-            //fillInUI();
         }
     }
 
@@ -182,6 +213,7 @@ public class EditActivity extends AppCompatActivity {
         Button title = (Button) findViewById(R.id.editLessonTitle);
         if (currLesson == null) {
             title.setText("Add Lesson Title");
+            return;
         } else {
             title.setText(currLesson.getTitle());
         }
@@ -196,25 +228,13 @@ public class EditActivity extends AppCompatActivity {
         addFlashCard.setOnClickListener(new FlashCardListener(null));
         ll.addView(addFlashCard);
 
-        if (currLesson == null) {
-            return;
-        }
+        // curr lesson, and thus cardlist, are garuanteed non null
+        List<FlashCard> cardList = currLesson.getFlashCardList();
 
-        List<FlashCard> cardList = null;
         // add button to edit all current cards
-        try {
-            cardList = new GetCardsFromLessonID().execute(currLesson.getId()).get();
-        } catch (Exception e) {
-
-        }
-
-        if (cardList == null) {
-            return;
-        }
-
         Iterator<FlashCard> itr = cardList.iterator();
-        Button currCardButton = new Button(this);
         while (itr.hasNext()) {
+            Button currCardButton = new Button(this);
             FlashCard currCard = itr.next();
             currCardButton.setText(currCard.getFront() + ":" + currCard.getBack());
             currCardButton.setOnClickListener(new FlashCardListener(currCard));
@@ -234,6 +254,9 @@ public class EditActivity extends AppCompatActivity {
             currLesson = new GetLessonFromID().execute(lessonID).get();
             if (currLesson == null) {
                 newLesson = true;
+            }
+            else {
+                currLesson.updateFlashCardList();
             }
         } catch (Exception e) {
             newLesson = true;
