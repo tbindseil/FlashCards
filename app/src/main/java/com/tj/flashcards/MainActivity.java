@@ -16,6 +16,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.tj.flashcards.DatabasePackage.API.AddLesson;
+import com.tj.flashcards.DatabasePackage.API.NukeTable;
 import com.tj.flashcards.DatabasePackage.Lesson;
 import com.tj.flashcards.DatabasePackage.API.GetAllLessons;
 
@@ -93,12 +95,15 @@ public class MainActivity extends AppCompatActivity {
         // allow access to ApplicationContext for databasse
         applicationContext = getApplicationContext();
 
+        List<Lesson> lessons = null;
+
         try {
-            List<Lesson> lessons = new GetAllLessons().execute().get();
-            listLessons(lessons);
+            lessons = new GetAllLessons().execute().get();
         } catch (Exception e) {
-            Toast.makeText(this, "I tried...", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "I tried...1", Toast.LENGTH_LONG).show();
         }
+
+        listLessons(lessons);
 
         // hide create button
         createButton = new Button(this);

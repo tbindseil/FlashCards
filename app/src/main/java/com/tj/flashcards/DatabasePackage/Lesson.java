@@ -13,7 +13,7 @@ import java.util.List;
 
 @Entity
 public class Lesson {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     @ColumnInfo(name = "title")

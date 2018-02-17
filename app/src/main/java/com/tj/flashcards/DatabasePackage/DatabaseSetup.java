@@ -14,7 +14,7 @@ public class DatabaseSetup {
 
     public static AppDatabase getDatabase() {
         if (db == null) {
-            db = Room.databaseBuilder(MainActivity.getAppContext(), AppDatabase.class, MainActivity.DATABASE_NAME).build();
+            db = Room.databaseBuilder(MainActivity.getAppContext(), AppDatabase.class, MainActivity.DATABASE_NAME).fallbackToDestructiveMigration().build();
         }
         return db;
     }
