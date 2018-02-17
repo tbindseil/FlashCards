@@ -40,9 +40,11 @@ public class EditActivity extends AppCompatActivity {
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if (currLesson != null) {
-                    currLesson.setTitle(input.getText().toString());
+                if (currLesson == null) {
+                    currLesson = new Lesson();
                 }
+                currLesson.setTitle(input.getText().toString());
+
                 try {
                     new UpdateLesson().execute(currLesson).get();
                 } catch (Exception e) {

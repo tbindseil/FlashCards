@@ -29,4 +29,7 @@ public interface LessonDao {
 
     @Update
     void updateLesson(Lesson lesson);
+
+    @Query("DELETE FROM lesson")
+    void nukeTable();
 }
