@@ -29,6 +29,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.lang.Math.toIntExact;
+
 public class EditActivity extends AppCompatActivity {
     //private String title = "s"
     // used to save or update
@@ -69,8 +71,14 @@ public class EditActivity extends AppCompatActivity {
     // todo no duplicates in update list
     public void onSaveLessonClicked(View view) {
         if (currLesson != null) {
+            Long[] lessonID = new Long[1];
             if (newLesson) {
-                new AddLesson().execute(currLesson);
+                try {
+                    lessonID = new AddLesson().execute(currLesson).get();
+                } catch (Exception e) {
+                    Intent intent = new Intent(EditActivity.this, MainActivity.class);
+                    startActivity(intent);
+                }
             } else {
                 new UpdateLesson().execute(currLesson);
             }
@@ -78,6 +86,9 @@ public class EditActivity extends AppCompatActivity {
             FlashCard[] toSave = new FlashCard[cardsToSave.size()];
             if (toSave.length > 0) {
                 toSave = cardsToSave.toArray(toSave);
+                for (int i = 0; i < toSave.length; i++) {
+                    toSave[i].setAssociatedLessonID(toIntExact(lessonID[0]));
+                }
                 new AddFlashCard().execute(toSave);
             }
 
@@ -139,8 +150,7 @@ public class EditActivity extends AppCompatActivity {
 
             if (card == null) {
                 builder.setTitle("Enter New Card as <front><colon><back>");
-            }
-            else {
+            } else {
                 builder.setTitle("Update Card as <front><colon><back>");
             }
 
@@ -252,8 +262,7 @@ public class EditActivity extends AppCompatActivity {
             currLesson = new GetLessonFromID().execute(lessonID).get();
             if (currLesson == null) {
                 newLesson = true;
-            }
-            else {
+            } else {
                 currLesson.updateFlashCardList();
             }
         } catch (Exception e) {

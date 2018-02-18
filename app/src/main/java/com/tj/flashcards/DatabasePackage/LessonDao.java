@@ -22,7 +22,7 @@ public interface LessonDao {
     Lesson getLesson(int id);
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    void insertLesson(Lesson lesson);
+    Long[] insertLesson(Lesson[] lessons);
 
     @Delete
     void deleteLesson(Lesson lesson);
