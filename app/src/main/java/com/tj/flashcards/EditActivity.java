@@ -81,6 +81,7 @@ public class EditActivity extends AppCompatActivity {
                 }
             } else {
                 new UpdateLesson().execute(currLesson);
+                lessonID[0] = (long)currLesson.getId();
             }
 
             FlashCard[] toSave = new FlashCard[cardsToSave.size()];
